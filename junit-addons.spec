@@ -48,6 +48,7 @@ BuildRequires:	jdom
 BuildRequires:	junit
 BuildRequires:	xerces-j2
 BuildRequires:	xml-commons-apis
+BuildRequires:  java-rpmbuild
 Requires:	ant
 Requires:	jakarta-commons-logging
 Requires:	jaxen
