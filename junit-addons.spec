@@ -34,7 +34,7 @@ Name:		junit-addons
 Summary:	JUnitX helper classes for JUnit
 Url:		http://sourceforge.net/projects/junit-addons/
 Version:	1.4
-Release:	%mkrel 2.0.2
+Release:	%mkrel 2.0.3
 Epoch:		0
 License:	Apache Software License
 Group:		Development/Java
