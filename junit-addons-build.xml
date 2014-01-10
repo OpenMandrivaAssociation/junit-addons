@@ -108,9 +108,9 @@
     <target name="test"
             depends="build"
             description="tests the junit-addons classes">
-        <java classname="junitx.runner.TestRunner" fork="yes">
-            <jvmarg value="-DPropertyManager.file=${test.src}/conf/tests.properties" />
-            <jvmarg value="-DXMLPropertyManager.file=${test.src}/conf/tests.xml" />
+        <java classname="junit.textui.TestRunner" fork="yes">
+            <jvmarg value="-DPropertyManager.file=${test.src}/tests.properties" />
+            <jvmarg value="-DXMLPropertyManager.file=${test.src}/tests.xml" />
             <arg line="-verbose" />
             <arg line="-runner.properties ${test.src}/conf/runner.properties" />
             <arg line="-test.properties ${test.src}/conf/tests.properties" />

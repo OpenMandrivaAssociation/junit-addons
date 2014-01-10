@@ -1,138 +1,139 @@
-# Copyright (c) 2000-2005, JPackage Project
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the
-#    distribution.
-# 3. Neither the name of the JPackage Project nor the names of its
-#    contributors may be used to endorse or promote products derived
-#    from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
+%{?_javapackages_macros:%_javapackages_macros}
+Name:          junit-addons
+Version:       1.4
+Release:       5.0%{?dist}
+Summary:       JUnitX helper classes for JUnit
 
-%define	section		free
+License:       ASL 1.1
+Url:           http://sourceforge.net/projects/%{name}/
+Source0:       http://sourceforge.net/projects/%{name}/files/JUnit-addons/JUnit-addons%20%{version}/%{name}-%{version}.zip
+# from http://junit-addons.cvs.sourceforge.net/viewvc/junit-addons/junit-addons/build.xml?view=markup&pathrev=release_1_4
+Source1:       %{name}-build.xml
+Source2:       http://mirrors.ibiblio.org/pub/mirrors/maven2/%{name}/%{name}/%{version}/%{name}-%{version}.pom
+BuildRequires: java-devel
+BuildRequires: jpackage-utils
 
-Name:		junit-addons
-Summary:	JUnitX helper classes for JUnit
-Url:		http://sourceforge.net/projects/junit-addons/
-Version:	1.4
-Release:	%mkrel 2.0.3
-Epoch:		0
-License:	Apache Software License
-Group:		Development/Java
-BuildArch:	noarch
-Source0:	%{name}-%{version}.zip
-Source1:	%{name}-build.xml
-BuildRequires:	ant
-BuildRequires:	jakarta-commons-logging
-BuildRequires:	jaxen
-BuildRequires:	jdom
-BuildRequires:	junit
-BuildRequires:	xerces-j2
-BuildRequires:	xml-commons-apis
-BuildRequires:  java-rpmbuild
-Requires:	ant
-Requires:	jakarta-commons-logging
-Requires:	jaxen
-Requires:	jdom
-Requires:	junit
-BuildRoot:	%{_tmppath}/%{name}-%{version}-buildroot
+BuildRequires: ant
+BuildRequires: apache-commons-logging
+BuildRequires: jaxen
+BuildRequires: jdom
+BuildRequires: junit4
+BuildRequires: xerces-j2
+BuildRequires: xml-commons-apis
+
+Requires:      ant
+Requires:      jaxen
+Requires:      jdom
+Requires:      junit4
+Requires:      xerces-j2
+
+Requires:      java
+Requires:      jpackage-utils
+BuildArch:     noarch
 
 %description
 JUnit-addons is a collection of helper classes for JUnit. 
-This library can be used with both JUnit 3.7 and JUnit 3.8.x
 
 %package javadoc
-Summary:	Javadoc for %{name}
-Group:		Development/Java
+
+Summary:       Javadoc for %{name}
+Requires:      jpackage-utils
 
 %description javadoc
-Javadoc for %{name}.
+This package contains javadoc for %{name}.
 
 %prep
-%setup -q -n %{name}-%{version}
-chmod -R go=u-w *
-jar xf src.jar
-%remove_java_binaries
-cp %{SOURCE1} build.xml
+%setup -q
+
+%jar xf src.jar
+find . -name "*.class" -delete
+find . -type f -name "*.jar" -delete
+find . -type f -name "*.zip" -delete
+
+rm -r api
+cp -p %{SOURCE1} build.xml
+
+# fix non ASCII chars
+for s in src/main/junitx/framework/TestSuite.java;do
+  native2ascii -encoding UTF8 ${s} ${s}
+done
+
+# disable test
+# some tests fails with the regenerate test resource
+# tests.jar
+# tests.zip
+sed -i "s| test, ||" build.xml
 
 %build
+# regenerate test resource
+#(
+#  cd src/example
+#  mkdir test
+#  javac -d test -source 1.4 -target 1.4 $(find . -name "*.java") -cp $(build-classpath junit4)
+#  rm test/junitx/example/*.class
+#  cp -p junitx/example/packageA/SampleA.txt test/junitx/example/packageA/
+#  cp -p junitx/example/packageA/packageB/SampleB.txt test/junitx/example/packageA/packageB/
+#  (
+#    cd test
+#    jar -cf ../tests.jar *
+##    zip -r ../tests.zip *
+#  )
+#  cp -p tests.jar tests.zip
+#  rm -r test
+#)
+
+export CLASSPATH=
+export OPT_JAR_LIST=:
 %ant \
-	-Dant.build.javac.source=1.4 \
-	-Djdom.jar=$(build-classpath jdom) \
-	-Djaxen.jar=$(build-classpath jaxen) \
-	-Dsaxpath.jar=$(build-classpath jaxen) \
-	-Dant.jar=$(build-classpath ant) \
-	-Djunit.jar=$(build-classpath junit) \
-	-Dxerces.jar=$(build-classpath xerces-j2) \
-	-Dxml-apis.jar=$(build-classpath xml-commons-apis) \
-	-Dcommons-logging.jar=$(build-classpath commons-logging) \
-	-Dproject.name=junit-addons \
-	-Dproject.version=1.4 \
-	release
+  -Dant.build.javac.source=1.4 \
+  -Djdom.jar=$(build-classpath jdom) \
+  -Djaxen.jar=$(build-classpath jaxen) \
+  -Dsaxpath.jar=$(build-classpath jaxen) \
+  -Dant.jar=$(build-classpath ant.jar) \
+  -Djunit.jar=$(build-classpath junit4) \
+  -Dxerces.jar=$(build-classpath xerces-j2) \
+  -Dxml-apis.jar=$(build-classpath xml-commons-apis) \
+  -Dcommons-logging.jar=$(build-classpath commons-logging) \
+  -Dproject.name=%{name} \
+  -Dproject.version=%{version} \
+  release
 
 %install
-rm -Rf $RPM_BUILD_ROOT
-# jars
-install -d -m 755 $RPM_BUILD_ROOT%{_javadir}
-install -m 644 dist/%{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/%{name}-%{version}.jar
-(cd $RPM_BUILD_ROOT%{_javadir} && for jar in *-%{version}*; do ln -sf ${jar} `echo $jar| sed  "s|-%{version}||g"`; done)
 
-# examples
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/%{name}
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/%{name}/examples
-cp -pr src/example/* $RPM_BUILD_ROOT%{_datadir}/%{name}/examples
+mkdir -p %{buildroot}%{_javadir}
+install -m 644 dist/%{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
 
-# javadoc
-install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-cp -pr api/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name} # ghost symlink
+mkdir -p %{buildroot}%{_mavenpomdir}
+install -pm 644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
+%add_maven_depmap JPP-%{name}.pom %{name}.jar
 
-%clean
-rm -rf $RPM_BUILD_ROOT
+mkdir -p %{buildroot}%{_javadocdir}/%{name}
+cp -pr build/api/* %{buildroot}%{_javadocdir}/%{name}
 
 %files
-%defattr(-,root,root)
-%doc {LICENSE,README,WHATSNEW}
-%{_javadir}/*
-%{_datadir}/%{name}
+%{_javadir}/%{name}.jar
+%{_mavenpomdir}/JPP-%{name}.pom
+%{_mavendepmapfragdir}/%{name}
+%doc LICENSE README WHATSNEW
 
 %files javadoc
-%defattr(-,root,root)
-%{_javadocdir}/%{name}-%{version}
-%doc %{_javadocdir}/%{name}
-
+%{_javadocdir}/%{name}
+%doc LICENSE
 
 %changelog
-* Fri Dec 10 2010 Oden Eriksson <oeriksson@mandriva.com> 0:1.4-2.0.3mdv2011.0
-+ Revision: 619864
-- the mass rebuild of 2010.0 packages
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.4-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
-* Fri Sep 04 2009 Thierry Vignaud <tv@mandriva.org> 0:1.4-2.0.2mdv2010.0
-+ Revision: 429651
-- rebuild
+* Thu Feb 14 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
-* Sun May 25 2008 Alexander Kurtakov <akurtakov@mandriva.org> 0:1.4-2.0.1mdv2009.0
-+ Revision: 211270
-- BR java-rpmbuild
-- import junit-addons
+* Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.4-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
+* Thu Jun 14 2012 gil cattaneo <puntogil@libero.it> 1.4-2
+- remove pre-compiled artefacts
+- add requires ant, jaxen, jdom
+
+* Sat May 05 2012 gil cattaneo <puntogil@libero.it> 1.4-1
+- initial rpm
 
