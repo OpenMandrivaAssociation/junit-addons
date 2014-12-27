@@ -1,9 +1,9 @@
 %{?_javapackages_macros:%_javapackages_macros}
 Name:          junit-addons
 Version:       1.4
-Release:       5.0%{?dist}
+Release:       8.1
 Summary:       JUnitX helper classes for JUnit
-
+Group:		Development/Java
 License:       ASL 1.1
 Url:           http://sourceforge.net/projects/%{name}/
 Source0:       http://sourceforge.net/projects/%{name}/files/JUnit-addons/JUnit-addons%20%{version}/%{name}-%{version}.zip
@@ -17,14 +17,14 @@ BuildRequires: ant
 BuildRequires: apache-commons-logging
 BuildRequires: jaxen
 BuildRequires: jdom
-BuildRequires: junit4
+BuildRequires: junit
 BuildRequires: xerces-j2
 BuildRequires: xml-commons-apis
 
 Requires:      ant
 Requires:      jaxen
 Requires:      jdom
-Requires:      junit4
+Requires:      junit
 Requires:      xerces-j2
 
 Requires:      java
@@ -35,9 +35,7 @@ BuildArch:     noarch
 JUnit-addons is a collection of helper classes for JUnit. 
 
 %package javadoc
-
 Summary:       Javadoc for %{name}
-Requires:      jpackage-utils
 
 %description javadoc
 This package contains javadoc for %{name}.
@@ -90,7 +88,7 @@ export OPT_JAR_LIST=:
   -Djaxen.jar=$(build-classpath jaxen) \
   -Dsaxpath.jar=$(build-classpath jaxen) \
   -Dant.jar=$(build-classpath ant.jar) \
-  -Djunit.jar=$(build-classpath junit4) \
+  -Djunit.jar=$(build-classpath junit) \
   -Dxerces.jar=$(build-classpath xerces-j2) \
   -Dxml-apis.jar=$(build-classpath xml-commons-apis) \
   -Dcommons-logging.jar=$(build-classpath commons-logging) \
@@ -110,10 +108,7 @@ install -pm 644 %{SOURCE2} %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
 mkdir -p %{buildroot}%{_javadocdir}/%{name}
 cp -pr build/api/* %{buildroot}%{_javadocdir}/%{name}
 
-%files
-%{_javadir}/%{name}.jar
-%{_mavenpomdir}/JPP-%{name}.pom
-%{_mavendepmapfragdir}/%{name}
+%files -f .mfiles
 %doc LICENSE README WHATSNEW
 
 %files javadoc
