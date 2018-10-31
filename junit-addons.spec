@@ -1,7 +1,7 @@
 %{?_javapackages_macros:%_javapackages_macros}
 Name:          junit-addons
 Version:       1.4
-Release:       8.2
+Release:       8.3
 Summary:       JUnitX helper classes for JUnit
 Group:		Development/Java
 License:       ASL 1.1
