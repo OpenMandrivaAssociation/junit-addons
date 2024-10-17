@@ -5,7 +5,7 @@ Release:       8.3
 Summary:       JUnitX helper classes for JUnit
 Group:		Development/Java
 License:       ASL 1.1
-Url:           http://sourceforge.net/projects/%{name}/
+Url:           https://sourceforge.net/projects/%{name}/
 Source0:       http://sourceforge.net/projects/%{name}/files/JUnit-addons/JUnit-addons%20%{version}/%{name}-%{version}.zip
 # from http://junit-addons.cvs.sourceforge.net/viewvc/junit-addons/junit-addons/build.xml?view=markup&pathrev=release_1_4
 Source1:       %{name}-build.xml
